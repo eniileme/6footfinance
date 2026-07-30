@@ -1,0 +1,75 @@
+import type { AppState } from '../types'
+
+export const STORAGE_KEY = '6footfinance-state-v1'
+
+export const defaultState: AppState = {
+  income: [
+    { id: 'salary', name: 'Salary', amount: 3400 },
+    { id: 'alimony', name: 'Alimony', amount: 196 },
+    { id: 'child-benefit', name: 'Child benefit', amount: 160 },
+  ],
+  fixedExpenses: [
+    { id: 'house-loan', name: 'House loan', amount: 1100 },
+    { id: 'condo-1', name: 'Condominium fee 1', amount: 223 },
+    { id: 'condo-2', name: 'Condominium fee 2', amount: 170 },
+    { id: 'car-loan', name: 'Car loan', amount: 223.81 },
+    { id: 'electricity', name: 'Electricity', amount: 20 },
+    { id: 'phone-device', name: 'Phone device', amount: 10 },
+    { id: 'kid-phone', name: 'Kid phone', amount: 20 },
+    { id: 'internet', name: 'Internet', amount: 20 },
+    { id: 'insurance-sinking', name: 'Insurance sinking fund', amount: 250 },
+  ],
+  budgetCategories: [
+    { id: 'groceries', name: 'Groceries', planned: 320 },
+    { id: 'gas-charging-parking', name: 'Gas / charging / parking', planned: 100 },
+    { id: 'child-extras', name: 'Child extras', planned: 60 },
+    { id: 'restaurants-cafes', name: 'Restaurants / cafés', planned: 60 },
+    { id: 'subscriptions', name: 'Subscriptions', planned: 25 },
+    { id: 'clothes-beauty', name: 'Clothes / beauty', planned: 40 },
+    { id: 'health', name: 'Health', planned: 30 },
+    { id: 'home', name: 'Home', planned: 34 },
+    { id: 'travel', name: 'Travel', planned: 0 },
+    { id: 'gifts', name: 'Gifts', planned: 0 },
+    { id: 'random-bullshit', name: 'Random bullshit', planned: 50 },
+    { id: 'savings-investments', name: 'Savings / investments', planned: 1000 },
+    { id: 'debt-overpayments', name: 'Debt overpayments', planned: 0 },
+  ],
+  transactions: [],
+  sinkingFunds: [
+    { id: 'insurance', name: 'Insurance', target: 3000, balance: 0, monthlyContribution: 250 },
+    { id: 'car-maintenance', name: 'Car maintenance', target: 2000, balance: 0, monthlyContribution: 150 },
+    { id: 'putkiremppa', name: 'Putkiremppa', target: 5000, balance: 0, monthlyContribution: 300 },
+    { id: 'gifts-christmas', name: 'Gifts / Christmas', target: 600, balance: 0, monthlyContribution: 50 },
+    { id: 'travel', name: 'Travel', target: 2000, balance: 0, monthlyContribution: 100 },
+    { id: 'child-expenses', name: 'Child expenses', target: 1500, balance: 0, monthlyContribution: 80 },
+    { id: 'tech-tools', name: 'Tech / tools', target: 1000, balance: 0, monthlyContribution: 40 },
+  ],
+  debts: [
+    {
+      id: 'mortgage',
+      name: 'Mortgage (house loan)',
+      balance: 180000,
+      monthlyPayment: 1100,
+      interestRate: 3.5,
+      notes: 'Update balance from your latest statement.',
+    },
+    {
+      id: 'car-loan',
+      name: 'Car loan',
+      balance: 8500,
+      monthlyPayment: 223.81,
+      interestRate: 4.9,
+      finalBalloon: 0,
+      notes: 'Update balance from your latest statement.',
+    },
+  ],
+  goals: {
+    minimumMonthlySaving: 1000,
+    stretchMonthlySaving: 1500,
+    emergencyBufferTarget: 20000,
+    indexFundTarget: 500,
+    carMaintenanceFund: 150,
+    putkiremppaFund: 300,
+  },
+  yearToDateSaved: 0,
+}
