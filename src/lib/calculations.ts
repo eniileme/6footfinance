@@ -2,12 +2,42 @@ import type { AppState, BudgetCategory } from '../types'
 import { VARIABLE_CATEGORIES } from '../types'
 import { isCurrentMonth, monthsRemainingInYear } from './format'
 
+/** Coerce to a finite non-negative number; missing/invalid/negative → 0. */
+function nonNegativeAmount(value: unknown): number {
+  const n = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(n) || n < 0) return 0
+  return n
+}
+
 export function sumIncome(state: AppState): number {
   return state.income.reduce((sum, i) => sum + i.amount, 0)
 }
 
+/** Genuine non-debt fixed expenses from the Monthly Budget owner. */
 export function sumFixedExpenses(state: AppState): number {
   return state.fixedExpenses.reduce((sum, e) => sum + e.amount, 0)
+}
+
+/** Required contractual payments from Debts (canonical owner). */
+export function sumRequiredDebtPayments(state: AppState): number {
+  return state.debts.reduce((sum, d) => sum + nonNegativeAmount(d.monthlyPayment), 0)
+}
+
+/** Planned monthly contributions from Sinking Funds (canonical owner). */
+export function sumSinkingFundContributions(state: AppState): number {
+  return state.sinkingFunds.reduce(
+    (sum, f) => sum + nonNegativeAmount(f.monthlyContribution),
+    0,
+  )
+}
+
+/** Fixed monthly commitments = genuine fixed + required debt + sinking contributions. */
+export function sumFixedCommitments(state: AppState): number {
+  return (
+    sumFixedExpenses(state) +
+    sumRequiredDebtPayments(state) +
+    sumSinkingFundContributions(state)
+  )
 }
 
 export function getCategoryPlanned(state: AppState, category: BudgetCategory): number {
@@ -24,10 +54,59 @@ export function plannedSavings(state: AppState): number {
   return getCategoryPlanned(state, 'savings-investments')
 }
 
+/**
+ * Residual of the total monthly savings target after planned sinking contributions.
+ * `plannedSavings` is the total target; sinking contributions are included inside it.
+ * Available for investments = max(target − sinking contributions, 0).
+ */
+export function plannedInvestmentAllocation(state: AppState): number {
+  return Math.max(plannedSavings(state) - sumSinkingFundContributions(state), 0)
+}
+
+/** How much planned sinking contributions exceed the total monthly savings target. */
+export function savingsTargetShortfall(state: AppState): number {
+  return Math.max(sumSinkingFundContributions(state) - plannedSavings(state), 0)
+}
+
+/**
+ * Actual savings-related allocation in the plan:
+ * sinking contributions + residual investment allocation.
+ * Equals the savings target when sinking ≤ target; equals sinking when sinking > target.
+ */
+export function totalPlannedSavingsAllocation(state: AppState): number {
+  return sumSinkingFundContributions(state) + plannedInvestmentAllocation(state)
+}
+
 export function plannedDebtOverpayments(state: AppState): number {
   return getCategoryPlanned(state, 'debt-overpayments')
 }
 
+/**
+ * Canonical total planned monthly outflows:
+ * fixed expenses + required debt + sinking contributions
+ * + variable + residual investment allocation + debt overpayments.
+ *
+ * Sinking contributions are part of the savings target (`plannedSavings`), so only
+ * `plannedInvestmentAllocation` is added on top of sinking — not the full target again.
+ */
+export function totalPlannedOutflows(state: AppState): number {
+  return (
+    sumFixedCommitments(state) +
+    sumVariablePlanned(state) +
+    plannedInvestmentAllocation(state) +
+    plannedDebtOverpayments(state)
+  )
+}
+
+/** Canonical remaining budget = income − total planned outflows. */
+export function remainingBudget(state: AppState): number {
+  return sumIncome(state) - totalPlannedOutflows(state)
+}
+
+/**
+ * @deprecated Legacy — omits required debt payments and sinking contributions.
+ * UI still imports this; replace with `totalPlannedOutflows` in a later step.
+ */
 export function totalPlannedOutflow(state: AppState): number {
   return (
     sumFixedExpenses(state) +
@@ -37,8 +116,18 @@ export function totalPlannedOutflow(state: AppState): number {
   )
 }
 
+/**
+ * @deprecated Legacy — omits required debt payments and sinking contributions.
+ * UI still imports this; replace with `remainingBudget` in a later step.
+ */
 export function remainingVariableBudget(state: AppState): number {
-  return sumIncome(state) - sumFixedExpenses(state) - plannedSavings(state) - plannedDebtOverpayments(state) - sumVariablePlanned(state)
+  return (
+    sumIncome(state) -
+    sumFixedExpenses(state) -
+    plannedSavings(state) -
+    plannedDebtOverpayments(state) -
+    sumVariablePlanned(state)
+  )
 }
 
 export function currentMonthTransactions(state: AppState) {

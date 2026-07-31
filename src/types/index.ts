@@ -62,8 +62,6 @@ export type Goals = {
   stretchMonthlySaving: number
   emergencyBufferTarget: number
   indexFundTarget: number
-  carMaintenanceFund: number
-  putkiremppaFund: number
 }
 
 export type AppState = {

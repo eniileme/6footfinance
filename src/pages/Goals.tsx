@@ -65,16 +65,6 @@ export function GoalsPage() {
               value={goals.emergencyBufferTarget}
               onChange={(v) => updateField('emergencyBufferTarget', v)}
             />
-            <CurrencyInput
-              label="Car maintenance fund (monthly)"
-              value={goals.carMaintenanceFund}
-              onChange={(v) => updateField('carMaintenanceFund', v)}
-            />
-            <CurrencyInput
-              label="Putkiremppa fund (monthly)"
-              value={goals.putkiremppaFund}
-              onChange={(v) => updateField('putkiremppaFund', v)}
-            />
           </div>
         </Card>
 

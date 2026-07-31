@@ -9,15 +9,12 @@ export const defaultState: AppState = {
     { id: 'child-benefit', name: 'Child benefit', amount: 160 },
   ],
   fixedExpenses: [
-    { id: 'house-loan', name: 'House loan', amount: 1100 },
     { id: 'condo-1', name: 'Condominium fee 1', amount: 223 },
     { id: 'condo-2', name: 'Condominium fee 2', amount: 170 },
-    { id: 'car-loan', name: 'Car loan', amount: 223.81 },
     { id: 'electricity', name: 'Electricity', amount: 20 },
     { id: 'phone-device', name: 'Phone device', amount: 10 },
     { id: 'kid-phone', name: 'Kid phone', amount: 20 },
     { id: 'internet', name: 'Internet', amount: 20 },
-    { id: 'insurance-sinking', name: 'Insurance sinking fund', amount: 250 },
   ],
   budgetCategories: [
     { id: 'groceries', name: 'Groceries', planned: 320 },
@@ -68,8 +65,6 @@ export const defaultState: AppState = {
     stretchMonthlySaving: 1500,
     emergencyBufferTarget: 20000,
     indexFundTarget: 500,
-    carMaintenanceFund: 150,
-    putkiremppaFund: 300,
   },
   yearToDateSaved: 0,
 }

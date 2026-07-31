@@ -1,11 +1,15 @@
+import { Link } from 'react-router-dom'
 import { useBudget } from '../context/BudgetContext'
 import {
   plannedDebtOverpayments,
   plannedSavings,
-  remainingVariableBudget,
+  remainingBudget,
   sumFixedExpenses,
   sumIncome,
+  sumRequiredDebtPayments,
+  sumSinkingFundContributions,
   sumVariablePlanned,
+  totalPlannedOutflows,
 } from '../lib/calculations'
 import { formatCurrency } from '../lib/format'
 import { VARIABLE_CATEGORIES } from '../types'
@@ -16,10 +20,14 @@ export function MonthlyBudget() {
 
   const income = sumIncome(state)
   const fixed = sumFixedExpenses(state)
+  const debtPayments = sumRequiredDebtPayments(state)
+  const sinkingContributions = sumSinkingFundContributions(state)
+  const fixedCommitments = fixed + debtPayments + sinkingContributions
   const variable = sumVariablePlanned(state)
   const savings = plannedSavings(state)
   const debtExtra = plannedDebtOverpayments(state)
-  const balance = remainingVariableBudget(state)
+  const plannedOutflows = totalPlannedOutflows(state)
+  const remaining = remainingBudget(state)
 
   const variableCategories = state.budgetCategories.filter((c) =>
     VARIABLE_CATEGORIES.includes(c.id),
@@ -28,6 +36,9 @@ export function MonthlyBudget() {
     (c) => c.id === 'savings-investments' || c.id === 'debt-overpayments',
   )
 
+  const debtsWithPayment = state.debts.filter((d) => d.monthlyPayment > 0)
+  const fundsWithContribution = state.sinkingFunds.filter((f) => f.monthlyContribution > 0)
+
   return (
     <div>
       <PageHeader
@@ -35,20 +46,25 @@ export function MonthlyBudget() {
         subtitle="Edit planned amounts. Income and fixed costs are editable here too."
       />
 
-      {balance !== 0 && (
-        <Alert variant={balance < 0 ? 'danger' : 'warn'} className="mb-6">
-          {balance < 0
-            ? `Budget is over-allocated by ${formatCurrency(Math.abs(balance))}.`
-            : `${formatCurrency(balance)} unallocated — consider adding to savings or sinking funds.`}
+      {remaining !== 0 && (
+        <Alert variant={remaining < 0 ? 'danger' : 'warn'} className="mb-6">
+          {remaining < 0
+            ? `Planned outflows exceed income by ${formatCurrency(Math.abs(remaining))}. Reduce spending, savings, or commitments.`
+            : `${formatCurrency(remaining)} remaining after plan — consider adding to savings or sinking funds.`}
         </Alert>
       )}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <SummaryPill label="Income" value={income} />
-        <SummaryPill label="Fixed" value={fixed} />
-        <SummaryPill label="Variable" value={variable} />
-        <SummaryPill label="Savings" value={savings} accent />
-        <SummaryPill label="Balance" value={balance} warn={balance < 0} />
+        <SummaryPill label="Fixed expenses" value={fixed} />
+        <SummaryPill label="Required debt payments" value={debtPayments} />
+        <SummaryPill label="Sinking fund contributions" value={sinkingContributions} />
+        <SummaryPill label="Total fixed commitments" value={fixedCommitments} />
+        <SummaryPill label="Variable spending" value={variable} />
+        <SummaryPill label="Planned savings" value={savings} accent />
+        {debtExtra > 0 && <SummaryPill label="Debt overpayments" value={debtExtra} />}
+        <SummaryPill label="Total planned outflows" value={plannedOutflows} />
+        <SummaryPill label="Remaining budget" value={remaining} warn={remaining < 0} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -61,18 +77,18 @@ export function MonthlyBudget() {
                   type="text"
                   value={item.name}
                   onChange={(e) => {
-                    const income = [...state.income]
-                    income[i] = { ...item, name: e.target.value }
-                    updateIncome(income)
+                    const next = [...state.income]
+                    next[i] = { ...item, name: e.target.value }
+                    updateIncome(next)
                   }}
                   className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
                 />
                 <CurrencyInput
                   value={item.amount}
                   onChange={(amount) => {
-                    const income = [...state.income]
-                    income[i] = { ...item, amount }
-                    updateIncome(income)
+                    const next = [...state.income]
+                    next[i] = { ...item, amount }
+                    updateIncome(next)
                   }}
                   className="w-32"
                 />
@@ -109,6 +125,63 @@ export function MonthlyBudget() {
             ))}
           </div>
         </Card>
+
+        {debtsWithPayment.length > 0 && (
+          <Card>
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <CardTitle>Required debt payments</CardTitle>
+              <Link to="/debts" className="text-xs font-medium text-accent hover:underline">
+                Manage in Debts
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {debtsWithPayment.map((debt) => (
+                <div
+                  key={debt.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2"
+                >
+                  <div>
+                    <p className="text-sm text-ink-soft">{debt.name}</p>
+                    <p className="text-xs text-muted">Managed in Debts</p>
+                  </div>
+                  <span className="text-sm font-medium tabular-nums text-ink">
+                    {formatCurrency(debt.monthlyPayment)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {fundsWithContribution.length > 0 && (
+          <Card>
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <CardTitle>Sinking fund contributions</CardTitle>
+              <Link
+                to="/sinking-funds"
+                className="text-xs font-medium text-accent hover:underline"
+              >
+                Manage in Sinking Funds
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {fundsWithContribution.map((fund) => (
+                <div
+                  key={fund.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2"
+                >
+                  <div>
+                    <p className="text-sm text-ink-soft">{fund.name}</p>
+                    <p className="text-xs text-muted">Managed in Sinking Funds</p>
+                  </div>
+                  <span className="text-sm font-medium tabular-nums text-ink">
+                    {formatCurrency(fund.monthlyContribution)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         <Card className="lg:col-span-2">
           <CardTitle>Variable spending categories</CardTitle>
