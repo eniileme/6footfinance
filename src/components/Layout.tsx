@@ -15,12 +15,7 @@ export function Layout() {
     <div className="min-h-screen bg-surface">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-widest text-accent">
-              Personal finance
-            </p>
-            <h1 className="text-xl font-semibold text-ink">6footfinance</h1>
-          </div>
+          <h1 className="text-xl font-semibold text-ink">6FootFinance</h1>
           <nav className="flex flex-wrap gap-1">
             {navItems.map((item) => (
               <NavLink
