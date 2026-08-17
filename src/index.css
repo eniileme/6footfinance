@@ -11,8 +11,8 @@
   --color-ink: #111827;
   --color-ink-soft: #374151;
   --color-subtle: #f3f4f6;
-  --color-accent: #0f766e;
-  --color-accent-light: #ecfdf5;
+  --color-accent: #5c3ae0;
+  --color-accent-light: #f1edfe;
   --color-warn: #d97706;
   --color-danger: #dc2626;
 }
@@ -25,8 +25,8 @@
   --color-ink: #f3f4f6;
   --color-ink-soft: #d1d5db;
   --color-subtle: #1f232b;
-  --color-accent: #2dd4bf;
-  --color-accent-light: rgba(45, 212, 191, 0.12);
+  --color-accent: #c4b5ff;
+  --color-accent-light: rgba(196, 181, 255, 0.14);
   --color-warn: #fbbf24;
   --color-danger: #f87171;
 }
