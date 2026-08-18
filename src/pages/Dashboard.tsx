@@ -19,6 +19,7 @@ export function Dashboard() {
   const { state } = useBudget()
 
   const income = sumIncome(state)
+  const incomeSourceCount = state.income.length
   const fixed = sumFixedExpenses(state)
   const savings = plannedSavings(state)
   const variablePlanned = sumVariablePlanned(state)
@@ -44,7 +45,11 @@ export function Dashboard() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Total income" value={formatCurrency(income)} />
+        <StatCard
+          label="Total income"
+          value={formatCurrency(income)}
+          sub={`${incomeSourceCount} source${incomeSourceCount === 1 ? '' : 's'}`}
+        />
         <StatCard label="Fixed expenses" value={formatCurrency(fixed)} />
         <StatCard
           label="Planned savings"
@@ -81,6 +86,26 @@ export function Dashboard() {
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardTitle>Income breakdown</CardTitle>
+          {state.income.length === 0 ? (
+            <p className="text-sm text-muted">Add income sources on Monthly budget.</p>
+          ) : (
+            <div className="space-y-3">
+              {state.income.map((source) => (
+                <AllocationRow
+                  key={source.id}
+                  label={source.name.trim() || 'Untitled source'}
+                  amount={source.amount}
+                  total={income}
+                  color="accent"
+                />
+              ))}
+            </div>
+          )}
+          <p className="mt-3 text-xs text-muted">Edit sources on the Monthly budget page.</p>
+        </Card>
+
         <Card>
           <CardTitle>Monthly saving target</CardTitle>
           <div className="space-y-4">
@@ -124,7 +149,7 @@ export function Dashboard() {
           </div>
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-2">
           <CardTitle>Monthly allocation</CardTitle>
           <div className="space-y-3">
             <AllocationRow label="Fixed expenses" amount={fixed} total={income} />

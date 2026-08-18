@@ -13,7 +13,7 @@ import {
 } from '../lib/calculations'
 import { formatCurrency } from '../lib/format'
 import { VARIABLE_CATEGORIES } from '../types'
-import { Alert, Card, CardTitle, CurrencyInput, PageHeader } from '../components/ui'
+import { Alert, Button, Card, CardTitle, CurrencyInput, PageHeader } from '../components/ui'
 
 export function MonthlyBudget() {
   const { state, updateBudgetCategory, updateIncome, updateFixedExpenses } = useBudget()
@@ -69,32 +69,65 @@ export function MonthlyBudget() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardTitle>Income</CardTitle>
-          <div className="space-y-3">
-            {state.income.map((item, i) => (
-              <div key={item.id} className="flex items-end gap-3">
-                <input
-                  type="text"
-                  value={item.name}
-                  onChange={(e) => {
-                    const next = [...state.income]
-                    next[i] = { ...item, name: e.target.value }
-                    updateIncome(next)
-                  }}
-                  className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
-                />
-                <CurrencyInput
-                  value={item.amount}
-                  onChange={(amount) => {
-                    const next = [...state.income]
-                    next[i] = { ...item, amount }
-                    updateIncome(next)
-                  }}
-                  className="w-32"
-                />
-              </div>
-            ))}
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <CardTitle>Income sources</CardTitle>
+            <span className="text-sm font-semibold tabular-nums text-ink">{formatCurrency(income)}</span>
           </div>
+          <p className="mb-4 text-sm text-muted">
+            Salary, benefits, alimony, rent, or any other monthly inflow. Rename, add, or remove as needed.
+          </p>
+          <div className="space-y-3">
+            {state.income.map((item, i) => {
+              const share = income > 0 ? (item.amount / income) * 100 : 0
+              return (
+                <div key={item.id} className="flex items-end gap-2">
+                  <input
+                    type="text"
+                    value={item.name}
+                    placeholder="e.g. Rental income"
+                    onChange={(e) => {
+                      const next = [...state.income]
+                      next[i] = { ...item, name: e.target.value }
+                      updateIncome(next)
+                    }}
+                    className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+                  />
+                  <CurrencyInput
+                    value={item.amount}
+                    onChange={(amount) => {
+                      const next = [...state.income]
+                      next[i] = { ...item, amount }
+                      updateIncome(next)
+                    }}
+                    className="w-28 shrink-0"
+                  />
+                  <span className="hidden w-12 shrink-0 pb-2 text-right text-xs tabular-nums text-muted sm:block">
+                    {share.toFixed(0)}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => updateIncome(state.income.filter((row) => row.id !== item.id))}
+                    disabled={state.income.length === 1}
+                    className="mb-0.5 shrink-0 px-1 text-xs text-muted hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+          <Button
+            variant="secondary"
+            className="mt-4"
+            onClick={() =>
+              updateIncome([
+                ...state.income,
+                { id: crypto.randomUUID(), name: '', amount: 0 },
+              ])
+            }
+          >
+            Add income source
+          </Button>
         </Card>
 
         <Card>
