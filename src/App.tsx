@@ -8,6 +8,7 @@ import { Transactions } from './pages/Transactions'
 import { SinkingFunds } from './pages/SinkingFunds'
 import { Debts } from './pages/Debts'
 import { GoalsPage } from './pages/Goals'
+import { SettingsPage } from './pages/Settings'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
               <Route path="sinking-funds" element={<SinkingFunds />} />
               <Route path="debts" element={<Debts />} />
               <Route path="goals" element={<GoalsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

@@ -1,45 +1,27 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
+import { SidebarProvider } from '../context/SidebarContext'
+import { MobileMenuButton, Sidebar } from './Sidebar'
 import { ThemeToggle } from './ThemeToggle'
-
-const navItems = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/budget', label: 'Monthly budget' },
-  { to: '/transactions', label: 'Transactions' },
-  { to: '/sinking-funds', label: 'Sinking funds' },
-  { to: '/debts', label: 'Debts' },
-  { to: '/goals', label: 'Goals' },
-]
 
 export function Layout() {
   return (
-    <div className="min-h-screen bg-surface">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <h1 className="text-xl font-semibold text-ink">6FootFinance</h1>
-          <nav className="flex flex-wrap gap-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) =>
-                  `rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-accent-light text-accent'
-                      : 'text-muted hover:bg-subtle hover:text-ink'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
+    <SidebarProvider>
+      <div className="flex min-h-screen bg-surface">
+        <Sidebar />
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card px-4 lg:hidden">
+            <MobileMenuButton />
+            <h1 className="text-lg font-semibold text-ink">6FootFinance</h1>
+          </header>
+
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:px-6">
+            <Outlet />
+          </main>
         </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 pb-24 sm:px-6">
-        <Outlet />
-      </main>
-      <ThemeToggle />
-    </div>
+
+        <ThemeToggle />
+      </div>
+    </SidebarProvider>
   )
 }
