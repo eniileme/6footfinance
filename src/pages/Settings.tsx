@@ -1,8 +1,12 @@
 import { useTheme } from '../context/ThemeContext'
-import { Card, CardTitle, PageHeader } from '../components/ui'
+import { useLocale } from '../context/LocaleContext'
+import type { AppLocale } from '../lib/locale'
+import { formatCurrency, formatDate, todayISO } from '../lib/format'
+import { Card, CardTitle, PageHeader, SelectInput } from '../components/ui'
 
 export function SettingsPage() {
   const { isDark, toggleTheme } = useTheme()
+  const { locale, locales, setLocale } = useLocale()
 
   return (
     <div>
@@ -38,9 +42,30 @@ export function SettingsPage() {
         </Card>
 
         <Card>
+          <CardTitle>Locale</CardTitle>
+          <p className="mb-4 text-sm text-muted">
+            Controls how amounts and dates are formatted. Currency stays in euros.
+          </p>
+          <SelectInput
+            label="Language & number format"
+            value={locale}
+            onChange={(value) => setLocale(value as AppLocale)}
+            options={locales.map((option) => ({
+              value: option.code,
+              label: `${option.label} (${option.nativeLabel})`,
+            }))}
+          />
+          <div className="mt-4 rounded-lg bg-subtle px-4 py-3 text-sm">
+            <p className="text-muted">Preview</p>
+            <p className="mt-1 tabular-nums text-ink">
+              {formatCurrency(1234.5)} · {formatDate(todayISO())}
+            </p>
+          </div>
+        </Card>
+
+        <Card className="lg:col-span-2">
           <CardTitle>Coming soon</CardTitle>
           <ul className="space-y-2 text-sm text-muted">
-            <li>Currency and locale</li>
             <li>Export / import data</li>
             <li>Default budget templates</li>
             <li>Notifications</li>

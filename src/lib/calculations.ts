@@ -1,6 +1,6 @@
 import type { AppState, BudgetCategory } from '../types'
 import { VARIABLE_CATEGORIES } from '../types'
-import { isCurrentMonth, monthsRemainingInYear } from './format'
+import { formatCurrency, isCurrentMonth, monthsRemainingInYear } from './format'
 
 /** Coerce to a finite non-negative number; missing/invalid/negative → 0. */
 function nonNegativeAmount(value: unknown): number {
@@ -204,7 +204,7 @@ export function variableSpendingWarning(state: AppState): {
 }
 
 function formatOverage(amount: number): string {
-  return new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR' }).format(amount)
+  return formatCurrency(amount)
 }
 
 export function projectedYearEndSavings(state: AppState): number {

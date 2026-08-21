@@ -1,9 +1,12 @@
 import { Outlet } from 'react-router-dom'
+import { useLocale } from '../context/LocaleContext'
 import { SidebarProvider } from '../context/SidebarContext'
 import { MobileMenuButton, Sidebar } from './Sidebar'
 import { ThemeToggle } from './ThemeToggle'
 
 export function Layout() {
+  const { locale } = useLocale()
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-surface">
@@ -15,7 +18,7 @@ export function Layout() {
             <h1 className="text-lg font-semibold text-ink">6FootFinance</h1>
           </header>
 
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:px-6">
+          <main key={locale} className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:px-6">
             <Outlet />
           </main>
         </div>

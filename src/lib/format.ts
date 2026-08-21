@@ -1,5 +1,7 @@
+import { getActiveLocale } from './locale'
+
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('fi-FI', {
+  return new Intl.NumberFormat(getActiveLocale(), {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 0,
@@ -8,11 +10,15 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatPercent(value: number): string {
-  return `${value.toFixed(1)}%`
+  return new Intl.NumberFormat(getActiveLocale(), {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value / 100)
 }
 
 export function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat('fi-FI', {
+  return new Intl.DateTimeFormat(getActiveLocale(), {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
